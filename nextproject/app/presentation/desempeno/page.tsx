@@ -186,20 +186,25 @@ const useEmployeeManager = () => {
   }, [searchTerm]);
 
   // Calcular nota final
-  const calculateFinalGrade = (data) => {
-    const numericFields = evaluationFields.map(field => field.key);
-    let sum = 0;
-    let count = 0;
-    
-    numericFields.forEach(field => {
-      if (data[field] !== 'NA' && data[field] !== '' && !isNaN(data[field])) {
-        sum += parseFloat(data[field]);
-        count++;
-      }
-    });
-    
-    return count > 0 ? (sum / count).toFixed(1) : '0.0';
-  };
+type EvaluatedMetrics = {
+  [key: string]: number | string;
+};
+
+const calculateFinalGrade = (data: EvaluatedMetrics): string => {
+  const numericFields = evaluationFields.map(field => field.key);
+  let sum = 0;
+  let count = 0;
+
+  numericFields.forEach(field => {
+    if (data[field] !== 'NA' && data[field] !== '' && !isNaN(Number(data[field]))) {
+      sum += parseFloat(data[field] as string);
+      count++;
+    }
+  });
+
+  return count > 0 ? (sum / count).toFixed(1) : '0.0';
+};
+
 
   // Resetear formulario
   const resetForm = () => {

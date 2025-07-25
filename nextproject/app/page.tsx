@@ -1,5 +1,6 @@
 "use client";
-import Dashboard from "../app/presentation/components/dashboard";
+import Dashboard from "./presentation/components/dashboard";
+
 
 export default function Home() {
   return (
