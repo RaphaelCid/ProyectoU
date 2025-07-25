@@ -1,6 +1,4 @@
-import type { NextConfig } from "next";
-
-const nextConfig: NextConfig = {
+const nextConfig = {
   async rewrites() {
     return [
       {
@@ -11,8 +9,12 @@ const nextConfig: NextConfig = {
         source: '/desempeno',
         destination: '/presentation/desempeno',
       },
+      {
+        source: '/login',
+        destination: '/presentation/login',
+      },
     ];
   },
 };
 
-export default nextConfig;
+module.exports = nextConfig;

@@ -4,7 +4,7 @@ import Dashboard from "../app/presentation/components/dashboard";
 export default function Home() {
   return (
     <div>
-      <div >
+      <div>
         <h1 className="text-center mb-5">¡Bienvenido, Ejemplo!</h1>
         <Dashboard />
       </div>

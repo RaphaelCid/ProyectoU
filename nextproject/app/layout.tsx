@@ -1,16 +1,13 @@
-import Navbar from './presentation/components/navbar';
-import '../static/css/globals.css';
-import type { Metadata } from "next";
+import "../static/css/globals.css";
+import { cookies } from "next/headers";
+import Navbar from "./presentation/components/navbar";
+import { AuthProvider } from "./context/AuthContext";
 
 export const metadata: Metadata = {
   title: "Proyecto Prototipo",
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="es" className="h-full">
       <head>
@@ -23,11 +20,11 @@ export default function RootLayout({
         />
         <link rel="icon" href="/img/icon.png" />
       </head>
-      <body className='bg-gradient-to-b from-slate-50 to-slate-300'>
-        <Navbar />
-        <main className="p-6 w-full min-h-screen">
-          {children}
-        </main>
+      <body className="bg-gradient-to-b from-slate-50 to-slate-300">
+        <AuthProvider>
+          <Navbar />
+          <main className="p-6 w-full min-h-screen">{children}</main>
+        </AuthProvider>
       </body>
     </html>
   );

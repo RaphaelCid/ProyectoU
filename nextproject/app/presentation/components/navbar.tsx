@@ -2,13 +2,15 @@
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { FiChevronDown, FiUser, FiLogOut } from "react-icons/fi";
-import Link from 'next/link';
+import Link from "next/link";
+import { useAuth } from "@/app/context/AuthContext"; // ajusta la ruta si es necesario
 
 const Navbar = () => {
   const [openMenu, setOpenMenu] = useState<string | null>(null);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const userMenuRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
+  const { isAuthenticated, logout } = useAuth();
 
   const toggleMenu = (menu: string) => {
     setOpenMenu(prev => (prev === menu ? null : menu));
@@ -21,8 +23,8 @@ const Navbar = () => {
   };
 
   const handleLogout = () => {
-    console.log("Cerrando sesión...");
-    router.push("/login");
+    logout();
+    router.push("/presentation/login");
   };
 
   useEffect(() => {
@@ -34,6 +36,8 @@ const Navbar = () => {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  if (!isAuthenticated) return null;
 
   return (
     <nav className="w-full bg-[#0b1f5b] text-white px-10 py-4 shadow-md">
