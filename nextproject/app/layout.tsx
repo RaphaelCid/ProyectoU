@@ -2,6 +2,8 @@ import "../static/css/globals.css";
 import { cookies } from "next/headers";
 import Navbar from "./presentation/components/navbar";
 import { AuthProvider } from "./context/AuthContext";
+import type { Metadata } from 'next';
+
 
 export const metadata: Metadata = {
   title: "Proyecto Prototipo",
