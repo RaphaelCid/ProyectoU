@@ -5,20 +5,51 @@ import { FiX } from "react-icons/fi";
 interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onSave: (data: InspeccionData) => void;
+  defaultData?: InspeccionData | null;
 }
 
-const NuevaInspeccionModal = ({ isOpen, onClose }: ModalProps) => {
+export type InspeccionData = {
+  id?: number;
+  codigo: string;
+  tipo: string;
+  fecha: string;
+  inspector: string;
+  area: string;
+  estado: string;
+  imagen: string;
+  descripcion: string;
+  revision: string;
+  centroTrabajo: string;
+};
+
+const defaultForm: InspeccionData = {
+  codigo: "",
+  tipo: "",
+  fecha: "",
+  inspector: "",
+  area: "",
+  estado: "Pendiente",
+  imagen: "",
+  descripcion: "",
+  revision: "",
+  centroTrabajo: ""
+};
+
+const NuevaInspeccionModal = ({ isOpen, onClose, onSave, defaultData }: ModalProps) => {
   const modalRef = useRef<HTMLDivElement>(null);
   const [visible, setVisible] = useState(false);
+  const [formData, setFormData] = useState<InspeccionData>(defaultForm);
 
   useEffect(() => {
     if (isOpen) {
+      setFormData(defaultData || defaultForm);
       setVisible(true);
     } else {
-      const timeout = setTimeout(() => setVisible(false), 200); // delay para animación
+      const timeout = setTimeout(() => setVisible(false), 200);
       return () => clearTimeout(timeout);
     }
-  }, [isOpen]);
+  }, [isOpen, defaultData]);
 
   const handleClickOutside = (e: MouseEvent) => {
     if (modalRef.current && !modalRef.current.contains(e.target as Node)) {
@@ -35,6 +66,16 @@ const NuevaInspeccionModal = ({ isOpen, onClose }: ModalProps) => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [isOpen]);
 
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!formData.codigo || !formData.tipo || !formData.fecha) {
+      alert("Por favor completa al menos Código, Tipo y Fecha.");
+      return;
+    }
+    onSave(formData);
+    onClose();
+  };
+
   if (!visible) return null;
 
   return (
@@ -49,7 +90,6 @@ const NuevaInspeccionModal = ({ isOpen, onClose }: ModalProps) => {
           isOpen ? "scale-100" : "scale-95"
         }`}
       >
-        {/* Botón cerrar */}
         <button
           onClick={onClose}
           className="absolute top-4 right-4 text-gray-600 hover:text-black"
@@ -57,36 +97,83 @@ const NuevaInspeccionModal = ({ isOpen, onClose }: ModalProps) => {
           <FiX size={24} />
         </button>
 
-        <h2 className="text-xl font-semibold mb-4 text-center">Nueva Inspección</h2>
+        <h2 className="text-xl font-semibold mb-4 text-center">
+          {defaultData ? "Editar Inspección" : "Nueva Inspección"}
+        </h2>
 
-        {/* Formulario */}
-        <form className="space-y-3">
-          <input type="text" placeholder="Patente - Código - Faena" className="w-full border p-2 rounded" />
-          <input type="text" placeholder="Tipo de inspección" className="w-full border p-2 rounded" />
-          <input type="date" className="w-full border p-2 rounded" />
-          <input type="text" placeholder="Inspector" className="w-full border p-2 rounded" />
-          <input type="text" placeholder="Área" className="w-full border p-2 rounded" />
-          <select className="w-full border p-2 rounded">
+        <form onSubmit={handleSubmit} className="space-y-3">
+          <input
+            type="text"
+            placeholder="Patente - Código - Faena"
+            value={formData.codigo}
+            onChange={(e) => setFormData({ ...formData, codigo: e.target.value })}
+            className="w-full border p-2 rounded"
+          />
+          <input
+            type="text"
+            placeholder="Tipo de inspección"
+            value={formData.tipo}
+            onChange={(e) => setFormData({ ...formData, tipo: e.target.value })}
+            className="w-full border p-2 rounded"
+          />
+          <input
+            type="date"
+            value={formData.fecha}
+            onChange={(e) => setFormData({ ...formData, fecha: e.target.value })}
+            className="w-full border p-2 rounded"
+          />
+          <input
+            type="text"
+            placeholder="Inspector"
+            value={formData.inspector}
+            onChange={(e) => setFormData({ ...formData, inspector: e.target.value })}
+            className="w-full border p-2 rounded"
+          />
+          <input
+            type="text"
+            placeholder="Área"
+            value={formData.area}
+            onChange={(e) => setFormData({ ...formData, area: e.target.value })}
+            className="w-full border p-2 rounded"
+          />
+          <select
+            value={formData.estado}
+            onChange={(e) => setFormData({ ...formData, estado: e.target.value })}
+            className="w-full border p-2 rounded"
+          >
             <option>Pendiente</option>
             <option>Completado</option>
             <option>Observado</option>
+            <option>Finalizada</option>
           </select>
-          <input type="text" placeholder="Nombre de imagen (img1.png)" className="w-full border p-2 rounded" />
-          <div>
-            <label htmlFor="file_input" className="block mb-1 text-sm font-medium text-gray-900">
-                Adjuntar Imagen
-            </label>
-            <input
-                id="file_input"
-                type="file"
-                className="block w-full border p-2 rounded text-gray-900 bg-white file:mr-4 file:py-2 file:px-4
-                        file:rounded file:border-0 file:text-sm file:font-semibold
-                        file:bg-[#0b1f5b] file:text-white hover:file:bg-blue-800"
-            />
-            </div>
-          <textarea placeholder="Descripción" className="w-full border p-2 rounded" rows={3}></textarea>
-          <input type="text" placeholder="Revisión" className="w-full border p-2 rounded" />
-          <input type="text" placeholder="Centro de Trabajo" className="w-full border p-2 rounded" />
+          <input
+            type="text"
+            placeholder="Nombre de imagen (img1.png)"
+            value={formData.imagen}
+            onChange={(e) => setFormData({ ...formData, imagen: e.target.value })}
+            className="w-full border p-2 rounded"
+          />
+          <textarea
+            placeholder="Descripción"
+            value={formData.descripcion}
+            onChange={(e) => setFormData({ ...formData, descripcion: e.target.value })}
+            className="w-full border p-2 rounded"
+            rows={3}
+          ></textarea>
+          <input
+            type="text"
+            placeholder="Revisión"
+            value={formData.revision}
+            onChange={(e) => setFormData({ ...formData, revision: e.target.value })}
+            className="w-full border p-2 rounded"
+          />
+          <input
+            type="text"
+            placeholder="Centro de Trabajo"
+            value={formData.centroTrabajo}
+            onChange={(e) => setFormData({ ...formData, centroTrabajo: e.target.value })}
+            className="w-full border p-2 rounded"
+          />
 
           <div className="text-right">
             <button

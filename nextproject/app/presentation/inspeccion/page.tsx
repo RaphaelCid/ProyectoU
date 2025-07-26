@@ -1,16 +1,10 @@
-"use client";
-import { useEffect, useRef, useState } from "react";
-import { FiX } from "react-icons/fi";
+'use client';
+import { useEffect, useState } from 'react';
+import { MdEdit, MdDelete } from 'react-icons/md';
+import { FiX } from 'react-icons/fi';
 
-interface ModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onSave: (data: InspeccionData) => void;
-  defaultData?: InspeccionData | null;
-}
-
-export type InspeccionData = {
-  id?: number;
+interface Inspeccion {
+  id: number;
   codigo: string;
   tipo: string;
   fecha: string;
@@ -21,172 +15,184 @@ export type InspeccionData = {
   descripcion: string;
   revision: string;
   centroTrabajo: string;
-};
+}
 
-const defaultForm: InspeccionData = {
-  codigo: "",
-  tipo: "",
-  fecha: "",
-  inspector: "",
-  area: "",
-  estado: "Pendiente",
-  imagen: "",
-  descripcion: "",
-  revision: "",
-  centroTrabajo: ""
-};
+const inspeccionesEjemplo: Inspeccion[] = [
+  {
+    id: 1,
+    codigo: "AB123-CD456-Faena Norte",
+    tipo: "General",
+    fecha: "2025-07-22",
+    inspector: "Juan Pérez",
+    area: "Zona Norte",
+    estado: "Pendiente",
+    imagen: "imagen1.png",
+    descripcion: "Se encontró un desperfecto menor en la maquinaria.",
+    revision: "Requiere seguimiento",
+    centroTrabajo: "Planta A",
+  },
+  {
+    id: 2,
+    codigo: "XZ890-YT321-Faena Sur",
+    tipo: "EPP",
+    fecha: "2025-07-20",
+    inspector: "Ana Díaz",
+    area: "Bodega",
+    estado: "Finalizada",
+    imagen: "imagen2.png",
+    descripcion: "Inspección completa sin observaciones.",
+    revision: "Aprobada",
+    centroTrabajo: "Planta B",
+  },
+];
 
-const NuevaInspeccionModal = ({ isOpen, onClose, onSave, defaultData }: ModalProps) => {
-  const modalRef = useRef<HTMLDivElement>(null);
-  const [visible, setVisible] = useState(false);
-  const [formData, setFormData] = useState<InspeccionData>(defaultForm);
+export default function InspeccionPage() {
+  const [inspecciones, setInspecciones] = useState<Inspeccion[]>([]);
+  const [formData, setFormData] = useState<Partial<Inspeccion>>({});
+  const [editandoId, setEditandoId] = useState<number | null>(null);
+  const [mostrarFormulario, setMostrarFormulario] = useState(false);
 
   useEffect(() => {
-    if (isOpen) {
-      setFormData(defaultData || defaultForm);
-      setVisible(true);
+    const data = localStorage.getItem('inspecciones');
+    const parsed = data ? JSON.parse(data) : [];
+  
+    if (parsed.length === 0) {
+      setInspecciones(inspeccionesEjemplo);
+      localStorage.setItem('inspecciones', JSON.stringify(inspeccionesEjemplo));
     } else {
-      const timeout = setTimeout(() => setVisible(false), 200);
-      return () => clearTimeout(timeout);
+      setInspecciones(parsed);
     }
-  }, [isOpen, defaultData]);
-
-  const handleClickOutside = (e: MouseEvent) => {
-    if (modalRef.current && !modalRef.current.contains(e.target as Node)) {
-      onClose();
-    }
-  };
+  }, []);
+  
 
   useEffect(() => {
-    if (isOpen) {
-      document.addEventListener("mousedown", handleClickOutside);
-    } else {
-      document.removeEventListener("mousedown", handleClickOutside);
-    }
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [isOpen]);
+    localStorage.setItem('inspecciones', JSON.stringify(inspecciones));
+  }, [inspecciones]);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!formData.codigo || !formData.tipo || !formData.fecha) {
-      alert("Por favor completa al menos Código, Tipo y Fecha.");
+  const handleGuardar = () => {
+    if (
+      !formData.codigo ||
+      !formData.tipo ||
+      !formData.fecha ||
+      !formData.inspector
+    )
       return;
+
+    if (editandoId !== null) {
+      setInspecciones((prev) =>
+        prev.map((i) =>
+          i.id === editandoId ? { ...(formData as Inspeccion), id: editandoId } : i
+        )
+      );
+    } else {
+      setInspecciones((prev) => [
+        ...prev,
+        { ...(formData as Inspeccion), id: Date.now() },
+      ]);
     }
-    onSave(formData);
-    onClose();
+
+    setFormData({});
+    setEditandoId(null);
+    setMostrarFormulario(false);
   };
 
-  if (!visible) return null;
+  const handleEditar = (inspeccion: Inspeccion) => {
+    setFormData(inspeccion);
+    setEditandoId(inspeccion.id);
+    setMostrarFormulario(true);
+  };
+
+  const handleEliminar = (id: number) => {
+    setInspecciones((prev) => prev.filter((i) => i.id !== id));
+  };
+
+  const handleCancelar = () => {
+    setFormData({});
+    setEditandoId(null);
+    setMostrarFormulario(false);
+  };
 
   return (
-    <div
-      className={`fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center transition-opacity duration-200 ${
-        isOpen ? "opacity-100" : "opacity-0 pointer-events-none"
-      }`}
-    >
-      <div
-        ref={modalRef}
-        className={`bg-white rounded-lg shadow-lg p-6 w-full max-w-lg relative max-h-[90vh] overflow-y-auto transform transition-transform duration-200 ${
-          isOpen ? "scale-100" : "scale-95"
-        }`}
-      >
+    <div className="p-6">
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl font-bold">Inspecciones</h1>
         <button
-          onClick={onClose}
-          className="absolute top-4 right-4 text-gray-600 hover:text-black"
+          onClick={() => {
+            setFormData({});
+            setEditandoId(null);
+            setMostrarFormulario(true);
+          }}
+          className="bg-[#0b1f5b] text-white px-4 py-2 rounded hover:bg-[#132a85] transition"
         >
-          <FiX size={24} />
+          + Nueva Inspección
         </button>
+      </div>
 
-        <h2 className="text-xl font-semibold mb-4 text-center">
-          {defaultData ? "Editar Inspección" : "Nueva Inspección"}
-        </h2>
-
-        <form onSubmit={handleSubmit} className="space-y-3">
-          <input
-            type="text"
-            placeholder="Patente - Código - Faena"
-            value={formData.codigo}
-            onChange={(e) => setFormData({ ...formData, codigo: e.target.value })}
-            className="w-full border p-2 rounded"
-          />
-          <input
-            type="text"
-            placeholder="Tipo de inspección"
-            value={formData.tipo}
-            onChange={(e) => setFormData({ ...formData, tipo: e.target.value })}
-            className="w-full border p-2 rounded"
-          />
-          <input
-            type="date"
-            value={formData.fecha}
-            onChange={(e) => setFormData({ ...formData, fecha: e.target.value })}
-            className="w-full border p-2 rounded"
-          />
-          <input
-            type="text"
-            placeholder="Inspector"
-            value={formData.inspector}
-            onChange={(e) => setFormData({ ...formData, inspector: e.target.value })}
-            className="w-full border p-2 rounded"
-          />
-          <input
-            type="text"
-            placeholder="Área"
-            value={formData.area}
-            onChange={(e) => setFormData({ ...formData, area: e.target.value })}
-            className="w-full border p-2 rounded"
-          />
-          <select
-            value={formData.estado}
-            onChange={(e) => setFormData({ ...formData, estado: e.target.value })}
-            className="w-full border p-2 rounded"
+      {mostrarFormulario && (
+        <div className="mb-6 border rounded-lg p-4 shadow relative bg-white">
+          <button
+            onClick={handleCancelar}
+            className="absolute top-2 right-2 text-gray-500 hover:text-black"
           >
-            <option>Pendiente</option>
-            <option>Completado</option>
-            <option>Observado</option>
-            <option>Finalizada</option>
-          </select>
-          <input
-            type="text"
-            placeholder="Nombre de imagen (img1.png)"
-            value={formData.imagen}
-            onChange={(e) => setFormData({ ...formData, imagen: e.target.value })}
-            className="w-full border p-2 rounded"
-          />
-          <textarea
-            placeholder="Descripción"
-            value={formData.descripcion}
-            onChange={(e) => setFormData({ ...formData, descripcion: e.target.value })}
-            className="w-full border p-2 rounded"
-            rows={3}
-          ></textarea>
-          <input
-            type="text"
-            placeholder="Revisión"
-            value={formData.revision}
-            onChange={(e) => setFormData({ ...formData, revision: e.target.value })}
-            className="w-full border p-2 rounded"
-          />
-          <input
-            type="text"
-            placeholder="Centro de Trabajo"
-            value={formData.centroTrabajo}
-            onChange={(e) => setFormData({ ...formData, centroTrabajo: e.target.value })}
-            className="w-full border p-2 rounded"
-          />
-
-          <div className="text-right">
+            <FiX size={20} />
+          </button>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <input type="text" value={formData.codigo || ''} onChange={(e) => setFormData({ ...formData, codigo: e.target.value })} placeholder="Patente - Código - Faena" className="border p-2 rounded" />
+            <input type="text" value={formData.tipo || ''} onChange={(e) => setFormData({ ...formData, tipo: e.target.value })} placeholder="Tipo de inspección" className="border p-2 rounded" />
+            <input type="date" value={formData.fecha || ''} onChange={(e) => setFormData({ ...formData, fecha: e.target.value })} className="border p-2 rounded" />
+            <input type="text" value={formData.inspector || ''} onChange={(e) => setFormData({ ...formData, inspector: e.target.value })} placeholder="Inspector" className="border p-2 rounded" />
+            <input type="text" value={formData.area || ''} onChange={(e) => setFormData({ ...formData, area: e.target.value })} placeholder="Área" className="border p-2 rounded" />
+            <input type="text" value={formData.estado || ''} onChange={(e) => setFormData({ ...formData, estado: e.target.value })} placeholder="Estado" className="border p-2 rounded" />
+            <input type="text" value={formData.imagen || ''} onChange={(e) => setFormData({ ...formData, imagen: e.target.value })} placeholder="Nombre imagen (img1.png)" className="border p-2 rounded" />
+            <input type="text" value={formData.revision || ''} onChange={(e) => setFormData({ ...formData, revision: e.target.value })} placeholder="Revisión" className="border p-2 rounded" />
+            <input type="text" value={formData.centroTrabajo || ''} onChange={(e) => setFormData({ ...formData, centroTrabajo: e.target.value })} placeholder="Centro de Trabajo" className="border p-2 rounded" />
+            <textarea value={formData.descripcion || ''} onChange={(e) => setFormData({ ...formData, descripcion: e.target.value })} placeholder="Descripción" rows={3} className="border p-2 rounded col-span-full"></textarea>
+          </div>
+          <div className="text-right mt-4">
             <button
-              type="submit"
+              onClick={handleGuardar}
               className="bg-[#0b1f5b] text-white px-4 py-2 rounded hover:bg-blue-800"
             >
               Guardar
             </button>
           </div>
-        </form>
+        </div>
+      )}
+
+      <div className="overflow-x-auto rounded shadow bg-white">
+        <table className="min-w-full text-sm">
+          <thead className="bg-gray-100">
+            <tr>
+              {["ID", "Código", "Tipo", "Fecha", "Inspector", "Área", "Estado", "Imagen", "Descripción", "Revisión", "Centro Trabajo", "Acciones"].map((h) => (
+                <th key={h} className="px-4 py-2 text-left font-semibold text-gray-700">{h}</th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {inspecciones.map((i) => (
+              <tr key={i.id} className="border-t hover:bg-gray-50">
+                <td className="px-4 py-2">{i.id}</td>
+                <td className="px-4 py-2">{i.codigo}</td>
+                <td className="px-4 py-2">{i.tipo}</td>
+                <td className="px-4 py-2">{i.fecha}</td>
+                <td className="px-4 py-2">{i.inspector}</td>
+                <td className="px-4 py-2">{i.area}</td>
+                <td className="px-4 py-2">{i.estado}</td>
+                <td className="px-4 py-2">{i.imagen}</td>
+                <td className="px-4 py-2">{i.descripcion}</td>
+                <td className="px-4 py-2">{i.revision}</td>
+                <td className="px-4 py-2">{i.centroTrabajo}</td>
+                <td className="px-4 py-2">
+                  <div className="flex space-x-2">
+                    <button onClick={() => handleEditar(i)} className="text-blue-600 hover:text-blue-800"><MdEdit /></button>
+                    <button onClick={() => handleEliminar(i.id)} className="text-red-600 hover:text-red-800"><MdDelete /></button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
     </div>
   );
-};
-
-export default NuevaInspeccionModal;
+}

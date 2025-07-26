@@ -97,25 +97,26 @@ const Navbar = () => {
 
         {/* Icono de Usuario */}
         <div className="relative ml-4" ref={userMenuRef}>
-          <button
-            onClick={toggleUserMenu}
-            className="h-10 w-10 rounded-full bg-slate-600 flex items-center justify-center hover:bg-[#221706]"
-          >
-            <FiUser className="text-white h-6 w-6" />
-          </button>
-
-          {userMenuOpen && (
-            <div className="absolute right-0 mt-2 w-48 bg-white text-black rounded shadow-lg z-50">
-              <Link href="/perfil" className="block px-4 py-3 hover:bg-gray-100">Mi perfil</Link>
-              <button
-                onClick={handleLogout}
-                className="flex items-center w-full px-4 py-3 text-red-600 hover:bg-red-100"
-              >
-                <FiLogOut className="mr-2" />
-                Cerrar sesión
-              </button>
-            </div>
-          )}
+            <button
+              onClick={toggleUserMenu}
+              className="h-10 w-10 rounded-full bg-slate-600 flex items-center justify-center hover:bg-[#221706]"
+            >
+              <FiUser className="text-white h-6 w-6" />
+            </button>
+              {userMenuOpen && (
+              <div className="absolute right-0 mt-2 w-48 bg-white text-black rounded shadow-lg z-50">
+              <Link href="/presentation/perfil" 
+                className="block px-4 py-3 hover:bg-gray-100"
+                onClick={() => setUserMenuOpen(false)}>Configuración de perfil</Link>
+                <button
+                  onClick={handleLogout}
+                  className="flex items-center w-full px-4 py-3 text-red-600 hover:bg-red-100"
+                >
+                  <FiLogOut className="mr-2" />
+                  Cerrar sesión
+                </button>
+              </div>
+            )}
         </div>
       </div>
     </nav>
