@@ -1,4 +1,4 @@
-
+"use client";
 const StatsSection = () => {
   const stats = [
     { label: 'Total Ventas', value: '12.5k', color: 'text-blue-600', bgColor: 'bg-blue-50' },

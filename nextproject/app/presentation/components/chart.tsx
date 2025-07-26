@@ -1,7 +1,8 @@
+"use client";
 import React, { useState } from 'react';
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-  BarChart, Bar, PieChart, Pie, Cell
+  BarChart, Bar, PieChart, Pie, Cell, TooltipProps
 } from 'recharts';
 
 const ChartSection = () => {
@@ -30,21 +31,24 @@ const ChartSection = () => {
     { name: 'Orgánico', value: 100, color: '#EF4444' },
   ];
 
-  const CustomTooltip = ({ active, payload, label }) => {
-    if (active && payload && payload.length) {
-      return (
-        <div className="bg-white p-3 border border-gray-200 rounded-lg shadow-lg">
-          <p className="text-gray-900 font-medium">{`${label}`}</p>
-          {payload.map((pld, index) => (
-            <p key={index} style={{ color: pld.color }} className="text-sm">
-              {`${pld.dataKey}: ${pld.value.toLocaleString()}`}
-            </p>
-          ))}
-        </div>
-      );
-    }
-    return null;
-  };
+
+  const CustomTooltip = ({ active, payload, label }: any) => {
+  if (active && payload && payload.length) {
+    return (
+      <div className="bg-white p-3 border border-gray-200 rounded-lg shadow-lg">
+        <p className="text-gray-900 font-medium">{`${label}`}</p>
+        {payload.map((pld: any, index: number) => (
+          <p key={index} style={{ color: pld.color ?? '#000' }} className="text-sm">
+            {`${pld.dataKey}: ${pld.value?.toLocaleString?.()}`}
+          </p>
+        ))}
+      </div>
+    );
+  }
+
+  return null;
+};
+
 
   const renderChart = () => {
     switch(activeChart) {
@@ -108,7 +112,8 @@ const ChartSection = () => {
                 cx="50%"
                 cy="50%"
                 labelLine={false}
-                label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                label={({ name, percent }) =>
+                  `${name} ${percent !== undefined ? (percent * 100).toFixed(0) : '0'}%`}
                 outerRadius={80}
                 fill="#8884d8"
                 dataKey="value"

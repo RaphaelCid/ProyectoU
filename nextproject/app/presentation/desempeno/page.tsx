@@ -3,8 +3,51 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { Plus, Trash2, Edit, Search, X, Check } from 'lucide-react';
 import DesempenoChart from "../components/desempenoChart";
 
+type Employee = {
+  id: number;
+  nombre: string;
+  cargo: string;
+  periodo: string;
+  planBuenConductor: number;
+  matrizImpacto: number;
+  fonoDenuncia: number | 'NA';
+  variablesOperacionales: number | 'NA';
+  observacionCabina: number | 'NA';
+  ops: number | 'NA';
+  percepcionRiesgo: number | 'NA';
+  incidentes: number | 'NA';
+  incidentesCTPFatal: number | 'NA';
+  formularioAsistencia: number | 'NA';
+  incidentesDAM: number | 'NA';
+  notaFinal: number;
+  selected: boolean;
+};
+
+type NumericFieldKeys = 
+  'planBuenConductor' | 'matrizImpacto' | 'fonoDenuncia' |
+  'variablesOperacionales' | 'observacionCabina' | 'ops' |
+  'percepcionRiesgo' | 'incidentes' |
+  'incidentesCTPFatal' | 'formularioAsistencia' | 'incidentesDAM' |
+  'notaFinal';
+
+const valueFields: (keyof Employee)[] = [
+  'planBuenConductor',
+  'matrizImpacto',
+  'fonoDenuncia',
+  'variablesOperacionales',
+  'observacionCabina',
+  'ops',
+  'percepcionRiesgo',
+  'incidentes',
+  'incidentesCTPFatal',
+  'formularioAsistencia',
+  'incidentesDAM',
+  'notaFinal'
+];
+
+
 // Datos iniciales
-const initialEmployees = [
+const initialEmployees: Employee[] = [
   {
     id: 1,
     nombre: 'Jairo Cadiz Zapata',
@@ -84,7 +127,7 @@ const initialEmployees = [
 ];
 
 // Configuración de campos y headers
-const evaluationFields = [
+const evaluationFields: { key: NumericFieldKeys; label: string }[] = [
   { key: 'planBuenConductor', label: 'Plan Buen Conductor' },
   { key: 'matrizImpacto', label: 'Matriz de Impacto' },
   { key: 'fonoDenuncia', label: 'Fono Denuncia' },
@@ -92,8 +135,13 @@ const evaluationFields = [
   { key: 'observacionCabina', label: 'Observación en Cabina' },
   { key: 'ops', label: 'OPS' },
   { key: 'percepcionRiesgo', label: 'Percepción del Riesgo' },
-  { key: 'incidentes', label: 'Incidentes' }
+  { key: 'incidentes', label: 'Incidentes' },
+  { key: 'incidentesCTPFatal', label: 'Incidentes CTP y Fatal' },
+  { key: 'formularioAsistencia', label: 'Formulario Asistencia' },
+  { key: 'incidentesDAM', label: 'Incidentes DAM (Solo)' },
+  { key: 'notaFinal', label: 'Nota Final' }
 ];
+
 
 const tableHeaders = [
   'Sel', 'Nombre', 'Cargo', 'Periodo', 'Plan Buen Conductor', 'Matriz de Impacto', 'Fono Denuncia',
@@ -103,7 +151,7 @@ const tableHeaders = [
 ];
 
 // Formulario inicial
-const initialFormData = {
+const initialFormData: Omit<Employee, 'id' | 'notaFinal' | 'selected'> = {
   nombre: '',
   cargo: '',
   periodo: new Date().toISOString().split('T')[0],
@@ -117,8 +165,9 @@ const initialFormData = {
   incidentes: 0,
   incidentesCTPFatal: 'NA',
   formularioAsistencia: 'NA',
-  incidentesDAM: 'NA'
+  incidentesDAM: 'NA',
 };
+
 
 // Constantes para localStorage
 const STORAGE_KEYS = {
@@ -158,11 +207,11 @@ const storage = {
 
 // Hook personalizado para gestión de empleados con localStorage
 const useEmployeeManager = () => {
-  const [employees, setEmployees] = useState(initialEmployees);
+  const [employees, setEmployees] = useState<Employee[]>(initialEmployees);
   const [showAddForm, setShowAddForm] = useState(false);
-  const [editingId, setEditingId] = useState(null);
+  const [editingId, setEditingId] = useState<number | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
-  const [formData, setFormData] = useState(initialFormData);
+  const [formData, setFormData] = useState<Omit<Employee, 'id' | 'notaFinal' | 'selected'>>(initialFormData);
 
   // Cargar datos desde localStorage al montar el componente
   useEffect(() => {
@@ -229,19 +278,46 @@ const calculateFinalGrade = (data: EvaluatedMetrics): string => {
   };
 
   // Editar empleado
-  const handleEdit = (employee) => {
-    setEditingId(employee.id);
-    setFormData({
-      ...employee,
-      fonoDenuncia: employee.fonoDenuncia === 'NA' ? 0 : employee.fonoDenuncia,
-      variablesOperacionales: employee.variablesOperacionales === 'NA' ? 0 : employee.variablesOperacionales,
-      observacionCabina: employee.observacionCabina === 'NA' ? 0 : employee.observacionCabina,
-      ops: employee.ops === 'NA' ? 0 : employee.ops,
-      percepcionRiesgo: employee.percepcionRiesgo === 'NA' ? 0 : employee.percepcionRiesgo,
-      incidentes: employee.incidentes === 'NA' ? 0 : employee.incidentes,
-    });
-    setShowAddForm(true);
-  };
+  const handleEdit = (employee: Employee) => {
+  const {
+    nombre,
+    cargo,
+    periodo,
+    planBuenConductor,
+    matrizImpacto,
+    fonoDenuncia,
+    variablesOperacionales,
+    observacionCabina,
+    ops,
+    percepcionRiesgo,
+    incidentes,
+    incidentesCTPFatal,
+    formularioAsistencia,
+    incidentesDAM
+  } = employee;
+
+  setEditingId(employee.id);
+
+  setFormData({
+    nombre,
+    cargo,
+    periodo,
+    planBuenConductor,
+    matrizImpacto,
+    fonoDenuncia: fonoDenuncia === 'NA' ? 0 : Number(fonoDenuncia),
+    variablesOperacionales: variablesOperacionales === 'NA' ? 0 : Number(variablesOperacionales),
+    observacionCabina: observacionCabina === 'NA' ? 0 : Number(observacionCabina),
+    ops: ops === 'NA' ? 0 : Number(ops),
+    percepcionRiesgo: percepcionRiesgo === 'NA' ? 0 : Number(percepcionRiesgo),
+    incidentes: incidentes === 'NA' ? 0 : Number(incidentes),
+    incidentesCTPFatal,
+    formularioAsistencia,
+    incidentesDAM
+  });
+
+  setShowAddForm(true);
+};
+
 
   // Actualizar empleado
   const handleUpdate = () => {
@@ -259,14 +335,14 @@ const calculateFinalGrade = (data: EvaluatedMetrics): string => {
   };
 
   // Eliminar empleado
-  const handleDelete = (id) => {
+  const handleDelete = (id: number) => {
     if (window.confirm('¿Estás seguro de que quieres eliminar este evaluado?')) {
       setEmployees(prev => prev.filter(emp => emp.id !== id));
     }
   };
 
   // Toggle selección
-  const toggleSelect = (id) => {
+  const toggleSelect = (id: number) => {
     setEmployees(prev => prev.map(emp =>
       emp.id === id ? { ...emp, selected: !emp.selected } : emp
     ));
@@ -311,13 +387,14 @@ const calculateFinalGrade = (data: EvaluatedMetrics): string => {
 };
 
 // Utilidades
-const getValueColor = (value) => {
+const getValueColor = (value: string | number | undefined): string => {
   if (value === 'NA' || value === undefined) return 'text-gray-400';
-  const numValue = parseFloat(value);
+  const numValue = parseFloat(String(value));
   if (numValue >= 4.5) return 'text-green-600';
   if (numValue >= 3.0) return 'text-yellow-600';
   return 'text-red-600';
 };
+
 
 // Componente principal
 const EmployeeManager = () => {
@@ -485,7 +562,7 @@ const EmployeeManager = () => {
                       step="0.1"
                       min="0"
                       max="5"
-                      value={formData[key]}
+                      value={formData[key as keyof typeof formData]}
                       onChange={(e) => setFormData({ ...formData, [key]: parseFloat(e.target.value) || 0 })}
                       className="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     />

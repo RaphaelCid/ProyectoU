@@ -1,3 +1,5 @@
+"use client";
+
 type CardProps = {
   title: string;
   description?: string;
