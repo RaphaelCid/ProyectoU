@@ -1,6 +1,6 @@
 'use client';
 import { useState } from 'react';
-import NuevaInspeccionModal from '../components/nuevainspeccionmodal';
+import NuevaInspeccionModal from '../components/inspeccionmodal';
 import { MdEdit, MdDelete } from "react-icons/md";
 
 export default function InspeccionPage() {
