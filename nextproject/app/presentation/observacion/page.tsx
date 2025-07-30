@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useMemo, useEffect } from 'react';
 import { Plus, Trash2, Edit, Search, X, Check } from 'lucide-react';
+import ErrorBoundary from "../components/ErrorBoundary";
 
 type Observacion = {
   id: number;
@@ -18,12 +19,12 @@ type Observacion = {
   selected: boolean;
 };
 
-const checklistPorActividad = {
+const checklistPorActividad: { [key: string]: string[] } = {
   'Contacto de seguridad OPS': ['prueba 1', 'prueba 2', 'prueba 3'],
   'Observación - Asistencia': ['prueba 4', 'prueba 5', 'prueba 6']
 };
 
-const trabajadores = {
+const trabajadores: { [key: string]: { rut: string; cargo: string } } = {
   'Juan Molina': { rut: '18652129-3', cargo: 'Maestro soldador' },
   'Maria Soledad': { rut: '19616321-2', cargo: 'Encargado área Producción' },
   'Hernan Fernandez': { rut: '10049166-4', cargo: 'Jefe área Producción' }
@@ -64,7 +65,7 @@ const useObservacionManager = () => {
   }, [formData.actividad]);
 
   useEffect(() => {
-    const trabajador = trabajadores[formData.nombre as keyof typeof trabajadores];
+    const trabajador = trabajadores[formData.nombre];
     if (trabajador) {
       setFormData(prev => ({ ...prev, rut: trabajador.rut, cargo: trabajador.cargo }));
     }
@@ -136,10 +137,10 @@ const useObservacionManager = () => {
   const handleUpdate = () => {
     const nota = calcularNota();
     const estado = determinarEstado(formData.fechaLimite);
-    const nuevaObservacion = { ...formData, nota, estado, id: editingId || Date.now() };
+    const nuevaObservacion = { ...formData, nota, estado, id: editingId || Date.now(), selected: false };
 
     if (editingId) {
-      setObservaciones(prev => prev.map(item => item.id === editingId ? nuevaObservacion : item));
+      setObservaciones(prev => prev.map(item => item.id === editingId ? { ...nuevaObservacion, selected: item.selected } : item));
     } else {
       setObservaciones(prev => [...prev, nuevaObservacion]);
     }
@@ -557,4 +558,10 @@ const ObservacionManager = () => {
   );
 };
 
-export default ObservacionManager;
+export default function ObservacionPage() {
+  return (
+    <ErrorBoundary>
+      <ObservacionManager />
+    </ErrorBoundary>
+  );
+}

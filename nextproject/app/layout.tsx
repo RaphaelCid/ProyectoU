@@ -20,7 +20,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           href="https://fonts.googleapis.com/css2?family=Roboto+Serif:ital,opsz,wght@0,8..144,100..900;1,8..144,100..900&display=swap"
           rel="stylesheet"
         />
-        <link rel="icon" href="/img/icon.png" />
+        <link rel="icon" href="/images/icon.png" />
       </head>
       <body className="bg-gradient-to-b from-slate-50 to-slate-300">
         <AuthProvider>

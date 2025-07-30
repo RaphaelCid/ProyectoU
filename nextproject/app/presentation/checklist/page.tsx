@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { useAuth } from "@/app/context/AuthContext";
 import { Edit, Trash2, Plus, Search, List, Eye, Clipboard } from "lucide-react";
+import ErrorBoundary from "../components/ErrorBoundary";
 
 interface ChecklistItem {
   id: number;
@@ -24,7 +25,15 @@ const tiposChecklist = ["Inspección", "Observación"];
 const estados = ["Activo", "Inactivo", "Borrador"];
 
 export default function ChecklistPage() {
-  const { isAuthenticated } = useAuth();
+  return (
+    <ErrorBoundary>
+      <ChecklistPageContent />
+    </ErrorBoundary>
+  );
+}
+
+function ChecklistPageContent() {
+  const { isAuthenticated, isLoading } = useAuth();
   const [checklists, setChecklists] = useState<Checklist[]>([
     {
       id: 1,
@@ -72,6 +81,17 @@ export default function ChecklistPage() {
     descripcion: "",
     tipo: ""
   });
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Cargando...</p>
+        </div>
+      </div>
+    );
+  }
 
   if (!isAuthenticated) {
     return (
@@ -122,13 +142,22 @@ export default function ChecklistPage() {
     if (editingId) {
       setChecklists(prev => prev.map(checklist => 
         checklist.id === editingId 
-          ? { ...checklist, ...formData }
+          ? { 
+              ...checklist, 
+              nombre: formData.nombre,
+              tipo: formData.tipo as "Inspección" | "Observación",
+              descripcion: formData.descripcion,
+              estado: formData.estado
+            }
           : checklist
       ));
     } else {
       const newChecklist: Checklist = {
         id: Math.max(...checklists.map(c => c.id)) + 1,
-        ...formData,
+        nombre: formData.nombre,
+        tipo: formData.tipo as "Inspección" | "Observación",
+        descripcion: formData.descripcion,
+        estado: formData.estado,
         items: [],
         fechaCreacion: new Date().toISOString().split('T')[0]
       };

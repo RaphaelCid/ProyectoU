@@ -224,11 +224,9 @@ const UserProfile = () => {
       {/* Foto de perfil */}
       <div className="flex items-center space-x-6">
         <div className="relative">
-          <img
-            src={profileImage}
-            alt="Foto de perfil"
-            className="w-24 h-24 rounded-full object-cover border-4 border-white shadow-lg"
-          />
+          <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
+            <User className="h-5 w-5 text-blue-600" />
+          </div>
           {isEditing && (
             <label className="absolute bottom-0 right-0 bg-blue-600 text-white p-2 rounded-full cursor-pointer hover:bg-blue-700 transition-colors">
               <Camera size={16} />

@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useAuth } from "@/app/context/AuthContext";
 import { useRouter } from "next/navigation";
 import { Edit, Trash2 } from "lucide-react";
+import ErrorBoundary from "../components/ErrorBoundary";
 
 interface Trabajador {
   rut: string;
@@ -47,6 +48,14 @@ interface Incidente {
 }
 
 export default function IncidentePage() {
+  return (
+    <ErrorBoundary>
+      <IncidentePageContent />
+    </ErrorBoundary>
+  );
+}
+
+function IncidentePageContent() {
   const { isAuthenticated, isLoading } = useAuth();
   const router = useRouter();
 
@@ -237,8 +246,27 @@ export default function IncidentePage() {
         tipoEvento: formData.tipoIncidente,
         fechaIncidente: formData.fechaHoraIncidente.split('T')[0],
         estado: "En Investigación",
-        ...formData,
-        riesgoEvaluado
+        tipoIncidente: formData.tipoIncidente,
+        lugarIncidente: formData.lugarIncidente,
+        fechaHoraIncidente: formData.fechaHoraIncidente,
+        fuenteEvento: formData.fuenteEvento,
+        agenteEvento: formData.agenteEvento,
+        riesgoEspecifico: formData.riesgoEspecifico,
+        edad: formData.edad,
+        antiguedadCargo: formData.antiguedadCargo,
+        parteCuerpoLesionada: formData.parteCuerpoLesionada,
+        tipoLesion: formData.tipoLesion,
+        equipo: formData.equipo,
+        proceso: formData.proceso,
+        danoMaterial: formData.danoMaterial,
+        danoAmbiental: formData.danoAmbiental,
+        descripcion: formData.descripcion,
+        probabilidad: formData.probabilidad,
+        consecuencias: formData.consecuencias,
+        riesgoEvaluado,
+        investigadores: formData.investigadores,
+        informador: formData.informador,
+        firmaInformador: formData.firmaInformador
       };
       setIncidentes(prev => [...prev, newIncidente]);
     }
@@ -312,12 +340,26 @@ export default function IncidentePage() {
   };
 
   if (isLoading) {
-    return <div className="flex justify-center items-center h-screen">Cargando...</div>;
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Cargando...</p>
+        </div>
+      </div>
+    );
   }
 
   if (!isAuthenticated) {
     router.push("/presentation/login");
-    return null;
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-gray-800 mb-4">Acceso Denegado</h1>
+          <p className="text-gray-600">Redirigiendo al login...</p>
+        </div>
+      </div>
+    );
   }
 
   return (
