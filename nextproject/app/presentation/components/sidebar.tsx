@@ -23,7 +23,7 @@ import {
 } from 'react-icons/fi';
 import { useState } from 'react';
 import { useAuth } from '@/app/context/AuthContext';
-import TypewriterText from '@/app/components/TypewriterText';
+import TypewriterText from '@/app/presentation/components/TypewriterText';
 
 export default function Sidebar() {
   const router = useRouter();
@@ -65,7 +65,7 @@ export default function Sidebar() {
       items: [
         { href: "/tipos-empresas", label: "Tipos de Empresas", icon: <FiGrid className="w-4 h-4" /> },
         { href: "/empresas", label: "Empresas", icon: <FiBriefcase className="w-4 h-4" /> },
-        { href: "/usuarios/nuevo", label: "Usuarios", icon: <FiPlus className="w-4 h-4" /> },
+        { href: "/usuarios", label: "Usuarios", icon: <FiPlus className="w-4 h-4" /> },
         { href: "/trabajadores", label: "Trabajadores", icon: <FiUsers className="w-4 h-4" /> },
         { href: "/cargos", label: "Cargos", icon: <FiBriefcase className="w-4 h-4" /> },
         { href: "/epp", label: "Tipo de EPP", icon: <FiPackage className="w-4 h-4" /> },

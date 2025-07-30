@@ -74,6 +74,10 @@ const nextConfig = {
         destination: '/presentation/epp',
       },
       {
+        source: '/entrega-epp',
+        destination: '/presentation/entrega-epp',
+      },
+      {
         source: '/capacitacion',
         destination: '/presentation/capacitacion',
       },

@@ -61,7 +61,6 @@ export default function LoginPage() {
             <div className="relative z-10 p-12 text-white h-full flex flex-col justify-center">
               <h1 className="text-4xl font-bold mb-4">¡Bienvenido de nuevo!</h1>
               <p className="text-lg mb-8 opacity-90">Inicia sesión para acceder a tu cuenta</p>
-              <p className="text-sm mt-auto text-center">¿No tienes una cuenta? <a href="#" className="underline hover:text-blue-200">Registrar cuenta</a></p>
             </div>
 
             {/* Patrón ondulado en la parte inferior */}

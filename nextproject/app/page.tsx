@@ -2,8 +2,8 @@
 import ChartSection from './presentation/components/chart';
 import CardsSection from './presentation/components/card'
 import StatsSection from './presentation/components/stat'
-import TypewriterText from './components/TypewriterText';
-import AnimatedLine from './components/AnimatedLine';
+import TypewriterText from './presentation/components/TypewriterText';
+import AnimatedLine from './presentation/components/AnimatedLine';
 
 export default function Home() {
   // Nombre de la empresa - se puede configurar desde variables de entorno

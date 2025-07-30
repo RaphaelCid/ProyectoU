@@ -1,7 +1,7 @@
 import "../static/css/globals.css";
 import { cookies } from "next/headers";
 import Sidebar from "./presentation/components/sidebar";
-import LayoutContent from "./components/LayoutContent";
+import LayoutContent from "./presentation/components/LayoutContent";
 import { AuthProvider } from "./context/AuthContext";
 import type { Metadata } from 'next';
 
