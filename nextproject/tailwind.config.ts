@@ -1,4 +1,5 @@
 import type { Config } from "tailwindcss";
+import scrollbar from 'tailwind-scrollbar';
 
 const config: Config = {
   content: [
@@ -6,7 +7,7 @@ const config: Config = {
     "./components/**/*.{js,ts,jsx,tsx,mdx}",
     "./app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
-  darkMode:'class',
+  darkMode: 'class',
   theme: {
     extend: {
       colors: {
@@ -17,6 +18,9 @@ const config: Config = {
       },
     },
   },
-  plugins: [],
+  plugins: [
+    scrollbar, 
+  ],
 };
+
 export default config;

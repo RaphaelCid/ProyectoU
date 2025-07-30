@@ -1,9 +1,9 @@
 import "../static/css/globals.css";
 import { cookies } from "next/headers";
-import Navbar from "./presentation/components/navbar";
+import Sidebar from "./presentation/components/sidebar";
+import LayoutContent from "./components/LayoutContent";
 import { AuthProvider } from "./context/AuthContext";
 import type { Metadata } from 'next';
-
 
 export const metadata: Metadata = {
   title: "Proyecto Prototipo",
@@ -24,8 +24,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body className="bg-gradient-to-b from-slate-50 to-slate-300">
         <AuthProvider>
-          <Navbar />
-          <main className="p-6 w-full min-h-screen">{children}</main>
+          <Sidebar />
+          <LayoutContent>
+            {children}
+          </LayoutContent>
         </AuthProvider>
       </body>
     </html>

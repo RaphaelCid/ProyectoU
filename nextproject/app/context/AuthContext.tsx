@@ -3,6 +3,7 @@ import { createContext, useContext, useEffect, useState } from "react";
 
 type AuthContextType = {
   isAuthenticated: boolean;
+  isLoading: boolean;
   login: () => void;
   logout: () => void;
 };
@@ -11,10 +12,22 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const tokenExists = document.cookie.includes("auth_token=");
-    setIsAuthenticated(tokenExists);
+    const checkAuth = () => {
+      try {
+        const tokenExists = document.cookie.includes("auth_token=");
+        setIsAuthenticated(tokenExists);
+      } catch (error) {
+        console.error("Error checking auth:", error);
+        setIsAuthenticated(false);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    checkAuth();
   }, []);
 
   const login = () => {
@@ -27,7 +40,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, login, logout }}>
+    <AuthContext.Provider value={{ isAuthenticated, isLoading, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

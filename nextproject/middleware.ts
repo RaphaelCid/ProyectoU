@@ -11,7 +11,7 @@ export function middleware(request: NextRequest) {
   // Si el usuario no está autenticado y va a una ruta privada
   const isProtectedRoute = !publicRoutes.includes(pathname);
   if (!isAuth && isProtectedRoute) {
-    return NextResponse.redirect(new URL('/presentation/login', request.url));
+    return NextResponse.redirect(new URL('/login', request.url));
   }
 
   // Si está autenticado y quiere acceder al login
