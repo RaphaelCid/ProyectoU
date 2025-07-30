@@ -176,6 +176,7 @@ const useObservacionManager = () => {
 
   return {
     observaciones,
+    setObservaciones,
     formData,
     setFormData,
     mostrarFormulario,
@@ -217,6 +218,7 @@ const getEstadoColor = (estado: string): string => {
 const ObservacionManager = () => {
   const {
     observaciones,
+    setObservaciones,
     formData,
     setFormData,
     mostrarFormulario,
